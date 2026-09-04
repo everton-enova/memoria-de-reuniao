@@ -10,7 +10,7 @@
 | GitHub | Concluído | Manter `main` sincronizada a cada sessão |
 | Groq local | Configurado | Implementar e testar o cliente de transcrição |
 | Groq produção | Pendente | Adicionar `GROQ_API_KEY` na Vercel |
-| Supabase | Pendente | Criar projeto, aplicar schema e configurar Storage |
+| Supabase | Conectado localmente | Aplicar schema e configurar Storage |
 | Vercel | Pendente | Criar/importar projeto e configurar variáveis |
 | Áudio e transcrição | Não iniciado | Implementar depois das integrações |
 
@@ -26,7 +26,7 @@ Arquivo usado: `.env.local`.
 - É carregado automaticamente pelo Next.js ao executar `pnpm dev`.
 - Está protegido pelo `.gitignore`.
 - Atualmente contém `GROQ_API_KEY` para os testes locais.
-- Ainda faltam `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` estão configuradas.
 
 ### Preview e produção
 
@@ -38,7 +38,7 @@ Cadastrar estas três variáveis na Vercel:
 | --- | --- | --- | --- |
 | `GROQ_API_KEY` | Sim | Development, Preview e Production | Groq Console |
 | `NEXT_PUBLIC_SUPABASE_URL` | Não | Development, Preview e Production | Supabase Project Settings → API |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Chave pública com RLS | Development, Preview e Production | Supabase Project Settings → API |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Chave pública com RLS | Development, Preview e Production | Supabase Project Settings → API |
 
 Regras:
 
@@ -106,13 +106,16 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 
 - [x] Clientes Supabase para navegador e servidor
 - [x] Actions de login e cadastro por e-mail
+- [x] URL e publishable key configuradas no ambiente local
+- [x] Proxy de renovação da sessão configurado para Next.js 16
 - [x] Schema inicial de reuniões, participantes, decisões e tarefas
 - [x] RLS inicial para isolamento por usuário
-- [ ] Projeto Supabase provisionado e conectado
+- [x] Projeto Supabase provisionado e conectado localmente
 - [ ] Migração aplicada em ambiente remoto
 - [ ] Bucket privado `meeting-audios` criado
 - [ ] Políticas RLS do Storage criadas e verificadas
-- [ ] Callback e renovação de sessão configurados
+- [x] Renovação de sessão configurada
+- [ ] Callback de confirmação de e-mail configurado
 - [ ] Logout implementado
 
 ### Áudio
@@ -175,8 +178,8 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 
 ## Ações necessárias do proprietário
 
-- [ ] Criar o projeto no Supabase
-- [ ] Adicionar URL e anon key do Supabase ao `.env.local`
+- [x] Criar o projeto no Supabase
+- [x] Adicionar URL e publishable key do Supabase ao `.env.local`
 - [ ] Criar o bucket privado `meeting-audios`
 - [ ] Aplicar o schema no Supabase
 - [ ] Criar ou importar o projeto na Vercel
