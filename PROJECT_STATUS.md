@@ -10,7 +10,7 @@
 | GitHub | Concluído | Manter `main` sincronizada a cada sessão |
 | Groq local | Configurado | Implementar e testar o cliente de transcrição |
 | Groq produção | Pendente | Adicionar `GROQ_API_KEY` na Vercel |
-| Supabase | Conectado localmente | Aplicar schema e configurar Storage |
+| Supabase | Configurado e verificado | Integrar dados reais e upload de áudio |
 | Vercel | Pendente | Criar/importar projeto e configurar variáveis |
 | Áudio e transcrição | Não iniciado | Implementar depois das integrações |
 
@@ -50,9 +50,9 @@ Regras:
 
 ### Fluxo completo de configuração
 
-1. Criar o projeto no Supabase.
-2. Executar `supabase/schema.sql` no SQL Editor.
-3. Criar o bucket privado `meeting-audios`.
+1. Criar o projeto no Supabase. **Concluído.**
+2. Executar `supabase/schema.sql` no SQL Editor. **Concluído em 04/09/2026.**
+3. Criar o bucket privado `meeting-audios`. **Concluído pelo script.**
 4. Copiar URL e anon key do Supabase para `.env.local`.
 5. Importar o repositório do GitHub na Vercel.
 6. Cadastrar as três variáveis no painel da Vercel.
@@ -111,9 +111,9 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [x] Schema inicial de reuniões, participantes, decisões e tarefas
 - [x] RLS inicial para isolamento por usuário
 - [x] Projeto Supabase provisionado e conectado localmente
-- [ ] Migração aplicada em ambiente remoto
-- [ ] Bucket privado `meeting-audios` criado
-- [ ] Políticas RLS do Storage criadas e verificadas
+- [x] Migração aplicada em ambiente remoto
+- [x] Bucket privado `meeting-audios` criado com limite de 200 MB e allowlist de áudio
+- [x] Quatro políticas RLS do Storage criadas e verificadas
 - [x] Renovação de sessão configurada
 - [ ] Callback de confirmação de e-mail configurado
 - [ ] Logout implementado
@@ -180,16 +180,16 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 
 - [x] Criar o projeto no Supabase
 - [x] Adicionar URL e publishable key do Supabase ao `.env.local`
-- [ ] Criar o bucket privado `meeting-audios`
-- [ ] Aplicar o schema no Supabase
+- [x] Criar o bucket privado `meeting-audios`
+- [x] Aplicar o schema no Supabase
 - [ ] Criar ou importar o projeto na Vercel
 - [ ] Adicionar as três variáveis à Vercel
 - [ ] Informar quando Supabase e Vercel estiverem configurados para o teste ponta a ponta
 
 ## Próximo marco — MVP funcional
 
-1. Provisionar e conectar Supabase e Groq.
-2. Atualizar o schema para arquivos de áudio e estados de processamento.
+1. Provisionar e conectar Supabase e Groq. **Concluído localmente.**
+2. Atualizar o schema para arquivos de áudio e estados de processamento. **Concluído.**
 3. Implementar gravação e upload privado.
 4. Implementar transcrição Groq.
 5. Gerar e persistir a memória estruturada.
@@ -206,3 +206,4 @@ O MVP estará concluído quando um usuário puder criar uma conta, gravar ou env
 | --- | --- | --- |
 | 04/09/2026 | `pnpm lint` | Aprovado |
 | 04/09/2026 | `pnpm build` | Aprovado — rotas `/` e `/login` |
+| 04/09/2026 | Supabase remoto | 4 tabelas públicas verificadas; bucket privado `meeting-audios` com 4 políticas, limite de 200 MB e 6 MIME types |
