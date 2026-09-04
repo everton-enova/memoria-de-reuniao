@@ -1,41 +1,62 @@
 import Link from "next/link";
-import { ArrowRight, CalendarDays, CheckCircle2, Clock3, FileText, Mic2, MoreHorizontal, Plus, Search, Sparkles, Users } from "lucide-react";
+import { Archive, ArrowUpRight, Building2, CalendarDays, ClipboardCheck, Clock3, FileAudio, FileText, ListChecks, Mic2, Plus, Search, ShieldCheck, Users } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 
 const meetings = [
-  { day: "04", month: "SET", title: "Planejamento do produto", time: "09:30 · 52 min", people: "Você, Ana, Caio +2", status: "Concluída", color: "bg-violet-500" },
-  { day: "03", month: "SET", title: "Alinhamento semanal — Marketing", time: "14:00 · 38 min", people: "Você, Marina, Lucas", status: "Concluída", color: "bg-emerald-500" },
-  { day: "02", month: "SET", title: "Entrevista com cliente", time: "11:00 · 45 min", people: "Você, Rafael", status: "Rascunho", color: "bg-amber-500" },
+  { date: "04 set", title: "Reunião de planejamento da unidade", area: "Coordenação Administrativa", time: "09:30 · 52 min", people: "6 participantes", status: "Finalizada" },
+  { date: "03 set", title: "Alinhamento semanal de projetos", area: "Núcleo de Projetos", time: "14:00 · 38 min", people: "4 participantes", status: "Finalizada" },
+  { date: "02 set", title: "Comitê de acompanhamento", area: "Gabinete", time: "11:00 · 45 min", people: "8 participantes", status: "Em revisão" },
+];
+
+const tasks = [
+  { title: "Consolidar contribuições para o plano de ação", owner: "Coordenação Administrativa", due: "Hoje" },
+  { title: "Validar cronograma de entregas do trimestre", owner: "Núcleo de Projetos", due: "Amanhã" },
+  { title: "Encaminhar minuta para análise técnica", owner: "Assessoria Técnica", due: "6 set" },
 ];
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#f6f7fb] text-slate-950">
-      <header className="border-b border-slate-200/80 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 lg:px-8">
-          <div className="flex items-center gap-3"><div className="grid size-9 place-items-center rounded-xl bg-violet-600 text-white shadow-lg shadow-violet-200"><Mic2 size={18} strokeWidth={2.5} /></div><span className="text-[17px] font-bold tracking-tight">Memória</span></div>
-          <div className="flex items-center gap-3"><button className="hidden rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 sm:block">Importar reunião</button><Link href="/login" className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-violet-700"><Plus size={16} /> Nova reunião</Link><div className="ml-1 grid size-9 place-items-center rounded-full bg-slate-900 text-xs font-bold text-white">EB</div></div>
+    <main className="min-h-screen bg-background text-foreground">
+      <header className="sticky top-0 z-20 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+        <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-6">
+          <div className="flex min-w-0 items-center gap-3"><div className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground"><Mic2 className="size-5" /></div><div className="min-w-0"><p className="truncate text-sm font-semibold">Memória de Reuniões</p><p className="truncate text-xs text-muted-foreground">Ambiente institucional</p></div></div>
+          <div className="flex items-center gap-2"><Button variant="outline" className="hidden sm:inline-flex"><FileAudio /> Importar áudio</Button><Button asChild><Link href="/login"><Plus /> Nova reunião</Link></Button><div aria-label="Perfil de Everton Barros" className="ml-1 grid size-9 place-items-center rounded-full border bg-muted text-xs font-semibold">EB</div></div>
         </div>
       </header>
 
-      <div className="mx-auto grid max-w-7xl gap-8 px-5 py-8 lg:grid-cols-[220px_1fr] lg:px-8">
-        <aside className="hidden lg:block">
-          <nav className="space-y-1 text-sm"><a className="flex items-center gap-3 rounded-xl bg-violet-50 px-3 py-2.5 font-semibold text-violet-700" href="#"><FileText size={18} /> Reuniões</a><a className="flex items-center gap-3 rounded-xl px-3 py-2.5 font-medium text-slate-500 hover:bg-white" href="#tarefas"><CheckCircle2 size={18} /> Tarefas <span className="ml-auto rounded-full bg-slate-200 px-2 py-0.5 text-[11px]">4</span></a><a className="flex items-center gap-3 rounded-xl px-3 py-2.5 font-medium text-slate-500 hover:bg-white" href="#"><Users size={18} /> Pessoas</a></nav>
-          <div className="mt-10 rounded-2xl bg-slate-950 p-4 text-white shadow-xl shadow-slate-200"><Sparkles className="mb-4 text-violet-300" size={21} /><p className="text-sm font-semibold">Sua memória, organizada.</p><p className="mt-1.5 text-xs leading-5 text-slate-400">Decisões e próximos passos sempre à mão.</p></div>
+      <div className="mx-auto grid max-w-[1440px] lg:grid-cols-[240px_1fr]">
+        <aside className="hidden min-h-[calc(100vh-4rem)] border-r p-4 lg:block">
+          <div className="mb-5 rounded-lg border bg-muted/40 p-3"><div className="flex items-center gap-2 text-xs font-medium text-muted-foreground"><Building2 className="size-4" /> Unidade atual</div><p className="mt-2 text-sm font-semibold">Coordenação Administrativa</p></div>
+          <nav aria-label="Navegação principal" className="space-y-1"><NavItem active icon={<FileText />} label="Reuniões" /><NavItem icon={<ListChecks />} label="Encaminhamentos" count="4" /><NavItem icon={<Users />} label="Participantes" /><NavItem icon={<Archive />} label="Arquivo" /></nav>
+          <Separator className="my-5" />
+          <div className="rounded-lg bg-primary p-4 text-primary-foreground"><ShieldCheck className="size-5" /><p className="mt-3 text-sm font-semibold">Informação protegida</p><p className="mt-1 text-xs leading-5 text-primary-foreground/75">Áudios e registros ficam restritos aos usuários autorizados da unidade.</p></div>
         </aside>
 
-        <section>
-          <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="text-sm font-medium text-violet-600">Quinta-feira, 4 de setembro</p><h1 className="mt-1 text-3xl font-bold tracking-[-0.03em] sm:text-4xl">Bom dia, Everton.</h1><p className="mt-2 text-slate-500">Aqui está o que aconteceu nas suas reuniões.</p></div><label className="flex h-11 w-full items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 text-sm text-slate-400 shadow-sm sm:w-64"><Search size={17} /><input className="w-full bg-transparent outline-none placeholder:text-slate-400" placeholder="Buscar nas reuniões" /></label></div>
-          <div className="mt-8 grid gap-4 sm:grid-cols-3"><Stat icon={<CalendarDays size={19} />} label="Reuniões este mês" value="12" note="3 esta semana" /><Stat icon={<Clock3 size={19} />} label="Tempo registrado" value="8h 42m" note="+18% no mês" /><Stat icon={<CheckCircle2 size={19} />} label="Tarefas em aberto" value="4" note="2 vencem hoje" alert /></div>
-          <div className="mt-9 flex items-center justify-between"><h2 className="text-lg font-bold">Reuniões recentes</h2><button className="flex items-center gap-1 text-sm font-semibold text-violet-600">Ver todas <ArrowRight size={15} /></button></div>
-          <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-            {meetings.map((meeting, index) => <article key={meeting.title} className={`group flex items-center gap-4 p-4 transition hover:bg-slate-50 sm:p-5 ${index < meetings.length - 1 ? "border-b border-slate-100" : ""}`}><div className="flex size-14 shrink-0 flex-col items-center justify-center rounded-xl bg-slate-100"><span className="text-lg font-bold leading-none">{meeting.day}</span><span className="mt-1 text-[9px] font-bold tracking-wider text-slate-500">{meeting.month}</span></div><div className={`hidden h-9 w-1 rounded-full sm:block ${meeting.color}`} /><div className="min-w-0 flex-1"><h3 className="truncate font-semibold">{meeting.title}</h3><p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500"><span>{meeting.time}</span><span className="hidden text-slate-300 sm:inline">•</span><span>{meeting.people}</span></p></div><span className={`hidden rounded-full px-2.5 py-1 text-[11px] font-semibold sm:inline ${meeting.status === "Rascunho" ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700"}`}>{meeting.status}</span><button aria-label="Mais opções" className="rounded-lg p-2 text-slate-400 hover:bg-slate-100"><MoreHorizontal size={18} /></button></article>)}
+        <section className="min-w-0 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+          <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+            <div><Badge variant="outline" className="mb-3"><CalendarDays className="mr-1.5 size-3.5" /> 4 de setembro de 2026</Badge><h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Visão geral da unidade</h1><p className="mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base">Acompanhe reuniões, decisões registradas e encaminhamentos pendentes.</p></div>
+            <div className="relative w-full xl:w-80"><Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input aria-label="Buscar reuniões" className="h-10 bg-card pl-9" placeholder="Buscar por assunto, unidade ou pessoa" /></div>
           </div>
-          <div id="tarefas" className="mt-9 grid gap-6 xl:grid-cols-[1.35fr_1fr]"><div><h2 className="text-lg font-bold">Próximos passos</h2><div className="mt-4 space-y-3"><Task title="Enviar proposta revisada para o cliente" source="Planejamento do produto" due="Hoje" /><Task title="Validar calendário da campanha" source="Alinhamento semanal — Marketing" due="Amanhã" /></div></div><div className="rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-700 p-6 text-white shadow-xl shadow-violet-200/60"><Sparkles className="text-violet-200" size={22} /><h2 className="mt-5 text-xl font-bold">Registre a próxima conversa</h2><p className="mt-2 text-sm leading-6 text-violet-100">Cole uma transcrição ou escreva suas notas. A estrutura já está pronta para decisões e tarefas.</p><Link href="/login" className="mt-5 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-violet-700">Começar agora <ArrowRight size={16} /></Link></div></div>
+
+          <div className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Metric icon={<CalendarDays />} label="Reuniões no mês" value="12" note="3 nesta semana" /><Metric icon={<Clock3 />} label="Tempo registrado" value="8h 42min" note="Áudios processados" /><Metric icon={<ClipboardCheck />} label="Decisões registradas" value="18" note="No mês atual" /><Metric icon={<ListChecks />} label="Encaminhamentos abertos" value="4" note="2 com prazo hoje" attention /></div>
+
+          <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(320px,.75fr)]">
+            <Card><CardHeader className="flex-row items-center justify-between gap-4"><div><CardTitle>Reuniões recentes</CardTitle><CardDescription className="mt-1.5">Registros mais recentes da unidade</CardDescription></div><Button variant="ghost" size="sm">Ver todas <ArrowUpRight /></Button></CardHeader><CardContent className="px-0 pb-0"><div className="divide-y">{meetings.map((meeting) => <article key={meeting.title} className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-muted/50"><div className="grid size-10 shrink-0 place-items-center rounded-lg border bg-muted text-xs font-semibold">{meeting.date}</div><div className="min-w-0 flex-1"><h2 className="truncate text-sm font-semibold group-hover:text-primary">{meeting.title}</h2><p className="mt-1 truncate text-xs text-muted-foreground">{meeting.area} · {meeting.time} · {meeting.people}</p></div><Badge variant={meeting.status === "Finalizada" ? "success" : "warning"} className="hidden sm:inline-flex">{meeting.status}</Badge><Button aria-label={`Abrir ${meeting.title}`} variant="ghost" size="icon"><ArrowUpRight /></Button></article>)}</div></CardContent></Card>
+            <Card><CardHeader><div className="flex items-center justify-between"><CardTitle>Encaminhamentos</CardTitle><Badge variant="secondary">4 abertos</Badge></div><CardDescription>Prazos e responsáveis prioritários</CardDescription></CardHeader><CardContent className="space-y-1">{tasks.map((task, index) => <Task key={task.title} {...task} urgent={index < 2} />)}<Button variant="outline" className="mt-4 w-full">Ver todos os encaminhamentos</Button></CardContent></Card>
+          </div>
+
+          <Card className="mt-6 border-primary/20 bg-primary/[0.035]"><CardContent className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex gap-4"><div className="grid size-11 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground"><Mic2 className="size-5" /></div><div><h2 className="font-semibold">Registrar uma nova reunião</h2><p className="mt-1 text-sm text-muted-foreground">Grave pelo navegador ou envie um arquivo de áudio para gerar a memória automaticamente.</p></div></div><Button asChild size="lg"><Link href="/login">Iniciar registro <ArrowUpRight /></Link></Button></CardContent></Card>
         </section>
       </div>
     </main>
   );
 }
 
-function Stat({ icon, label, value, note, alert = false }: { icon: React.ReactNode; label: string; value: string; note: string; alert?: boolean }) { return <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div className="flex items-center justify-between"><span className="grid size-9 place-items-center rounded-xl bg-violet-50 text-violet-600">{icon}</span><span className={`text-[11px] font-semibold ${alert ? "text-rose-500" : "text-slate-400"}`}>{note}</span></div><p className="mt-5 text-2xl font-bold tracking-tight">{value}</p><p className="mt-1 text-xs text-slate-500">{label}</p></div>; }
-function Task({ title, source, due }: { title: string; source: string; due: string }) { return <div className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><button aria-label="Concluir tarefa" className="mt-0.5 size-5 shrink-0 rounded-full border-2 border-slate-300 hover:border-violet-500" /><div className="min-w-0 flex-1"><p className="text-sm font-semibold">{title}</p><p className="mt-1 truncate text-xs text-slate-400">{source}</p></div><span className="text-xs font-semibold text-rose-500">{due}</span></div>; }
+function NavItem({ icon, label, count, active = false }: { icon: React.ReactNode; label: string; count?: string; active?: boolean }) { return <a href="#" aria-current={active ? "page" : undefined} className={cn("flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors [&_svg]:size-4", active ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:bg-accent hover:text-accent-foreground")}>{icon}<span>{label}</span>{count ? <Badge variant="secondary" className="ml-auto">{count}</Badge> : null}</a>; }
+function Metric({ icon, label, value, note, attention = false }: { icon: React.ReactNode; label: string; value: string; note: string; attention?: boolean }) { return <Card><CardContent className="p-5"><div className="flex items-start justify-between"><div className="grid size-9 place-items-center rounded-lg bg-primary/10 text-primary [&_svg]:size-4">{icon}</div>{attention ? <Badge variant="warning">Atenção</Badge> : null}</div><p className="mt-5 text-2xl font-semibold tracking-tight">{value}</p><p className="mt-1 text-sm font-medium">{label}</p><p className="mt-1 text-xs text-muted-foreground">{note}</p></CardContent></Card>; }
+function Task({ title, owner, due, urgent }: { title: string; owner: string; due: string; urgent: boolean }) { return <div className="flex gap-3 rounded-lg p-3 transition-colors hover:bg-muted/60"><button aria-label={`Concluir: ${title}`} className="mt-0.5 size-5 shrink-0 rounded-full border-2 border-muted-foreground/35 outline-none hover:border-primary focus-visible:ring-2 focus-visible:ring-ring" /><div className="min-w-0 flex-1"><p className="text-sm font-medium leading-5">{title}</p><p className="mt-1 truncate text-xs text-muted-foreground">{owner}</p></div><span className={cn("shrink-0 text-xs font-medium", urgent ? "text-amber-700" : "text-muted-foreground")}>{due}</span></div>; }

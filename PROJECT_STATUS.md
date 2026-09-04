@@ -9,9 +9,9 @@
 | Código-base | Concluído | Evoluir o dashboard demonstrativo para o fluxo real |
 | GitHub | Concluído | Manter `main` sincronizada a cada sessão |
 | Groq local | Configurado | Implementar e testar o cliente de transcrição |
-| Groq produção | Pendente | Adicionar `GROQ_API_KEY` na Vercel |
+| Groq produção | Configurado | Implementar e testar a transcrição |
 | Supabase | Configurado e verificado | Integrar dados reais e upload de áudio |
-| Vercel | Pendente | Criar/importar projeto e configurar variáveis |
+| Vercel | Publicado | Manter deploy automático pela `main` |
 | Áudio e transcrição | Não iniciado | Implementar depois das integrações |
 
 ## Fluxo dos ambientes e das chaves
@@ -85,6 +85,7 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [x] Repositório e projeto Next.js inicializados
 - [x] Tailwind CSS configurado
 - [x] Layout responsivo inicial
+- [x] Design system shadcn/ui com primitivas Radix UI
 - [x] Metadados e idioma `pt-BR`
 - [x] `.env.example` criado
 - [x] README com instruções iniciais
@@ -98,6 +99,8 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [x] Lista demonstrativa de reuniões
 - [x] Lista demonstrativa de tarefas
 - [x] Tela de login e cadastro
+- [x] Dashboard reposicionado para uso institucional no setor público
+- [x] Tela de acesso com linguagem institucional
 - [ ] Dashboard conectado aos dados reais do Supabase
 - [ ] Estados de carregamento, vazio e erro
 - [ ] Navegação mobile completa
@@ -132,7 +135,7 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 ### Groq e processamento
 
 - [x] `GROQ_API_KEY` configurada no ambiente local
-- [ ] `GROQ_API_KEY` configurada na Vercel para Preview e Production
+- [x] `GROQ_API_KEY` configurada na Vercel para Preview e Production
 - [ ] Cliente Groq somente no servidor
 - [ ] Transcrição do áudio em nuvem
 - [ ] Geração de título e resumo
@@ -168,9 +171,9 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 
 ### Deploy e operação
 
-- [ ] Projeto criado na Vercel
-- [ ] Variáveis configuradas em Development, Preview e Production
-- [ ] Primeiro deploy publicado
+- [x] Projeto criado na Vercel
+- [x] Variáveis configuradas em Preview e Production
+- [x] Primeiro deploy publicado
 - [ ] URLs de autenticação configuradas no Supabase
 - [ ] Fluxo completo testado em produção
 - [ ] Monitoramento de erros
@@ -182,9 +185,9 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [x] Adicionar URL e publishable key do Supabase ao `.env.local`
 - [x] Criar o bucket privado `meeting-audios`
 - [x] Aplicar o schema no Supabase
-- [ ] Criar ou importar o projeto na Vercel
-- [ ] Adicionar as três variáveis à Vercel
-- [ ] Informar quando Supabase e Vercel estiverem configurados para o teste ponta a ponta
+- [x] Criar ou importar o projeto na Vercel
+- [x] Adicionar as três variáveis à Vercel
+- [x] Informar quando Supabase e Vercel estiverem configurados para o teste ponta a ponta
 
 ## Próximo marco — MVP funcional
 
@@ -207,3 +210,4 @@ O MVP estará concluído quando um usuário puder criar uma conta, gravar ou env
 | 04/09/2026 | `pnpm lint` | Aprovado |
 | 04/09/2026 | `pnpm build` | Aprovado — rotas `/` e `/login` |
 | 04/09/2026 | Supabase remoto | 4 tabelas públicas verificadas; bucket privado `meeting-audios` com 4 políticas, limite de 200 MB e 6 MIME types |
+| 04/09/2026 | Interface institucional Radix/shadcn | Lint e build aprovados; renderização local verificada sem erros no navegador |

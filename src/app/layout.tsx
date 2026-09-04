@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Memória — Suas reuniões organizadas",
-  description: "Registre decisões, tarefas e aprendizados de cada reunião.",
+  title: "Memória de Reuniões — Ambiente institucional",
+  description: "Registre reuniões, decisões e encaminhamentos da sua unidade.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
