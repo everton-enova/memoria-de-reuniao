@@ -2,6 +2,70 @@
 
 Última atualização: 4 de setembro de 2026
 
+## Resumo executivo
+
+| Área | Estado | Próxima ação |
+| --- | --- | --- |
+| Código-base | Concluído | Evoluir o dashboard demonstrativo para o fluxo real |
+| GitHub | Concluído | Manter `main` sincronizada a cada sessão |
+| Groq local | Configurado | Implementar e testar o cliente de transcrição |
+| Groq produção | Pendente | Adicionar `GROQ_API_KEY` na Vercel |
+| Supabase | Pendente | Criar projeto, aplicar schema e configurar Storage |
+| Vercel | Pendente | Criar/importar projeto e configurar variáveis |
+| Áudio e transcrição | Não iniciado | Implementar depois das integrações |
+
+## Fluxo dos ambientes e das chaves
+
+O GitHub guarda somente o código e o arquivo `.env.example`, que contém nomes de variáveis sem valores. Segredos nunca vão para o GitHub.
+
+### Desenvolvimento local
+
+Arquivo usado: `.env.local`.
+
+- Fica apenas na máquina de desenvolvimento.
+- É carregado automaticamente pelo Next.js ao executar `pnpm dev`.
+- Está protegido pelo `.gitignore`.
+- Atualmente contém `GROQ_API_KEY` para os testes locais.
+- Ainda faltam `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+
+### Preview e produção
+
+Local usado: **Vercel → projeto → Settings → Environment Variables**.
+
+Cadastrar estas três variáveis na Vercel:
+
+| Variável | É segredo? | Ambientes | Origem |
+| --- | --- | --- | --- |
+| `GROQ_API_KEY` | Sim | Development, Preview e Production | Groq Console |
+| `NEXT_PUBLIC_SUPABASE_URL` | Não | Development, Preview e Production | Supabase Project Settings → API |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Chave pública com RLS | Development, Preview e Production | Supabase Project Settings → API |
+
+Regras:
+
+- `GROQ_API_KEY` nunca recebe o prefixo `NEXT_PUBLIC_` e só pode ser lida pelo backend.
+- A chave Groq colocada em `.env.local` não chega automaticamente à Vercel; é necessário cadastrá-la também no painel da Vercel.
+- Depois de alterar uma variável na Vercel, é necessário fazer um novo deploy para a mudança entrar em produção.
+- Preview e Production podem começar com o mesmo projeto Supabase no MVP. Antes de crescer, separar banco de testes e banco de produção.
+- Não usar nem expor `SUPABASE_SERVICE_ROLE_KEY` neste MVP. As operações devem respeitar o usuário autenticado e as políticas RLS.
+
+### Fluxo completo de configuração
+
+1. Criar o projeto no Supabase.
+2. Executar `supabase/schema.sql` no SQL Editor.
+3. Criar o bucket privado `meeting-audios`.
+4. Copiar URL e anon key do Supabase para `.env.local`.
+5. Importar o repositório do GitHub na Vercel.
+6. Cadastrar as três variáveis no painel da Vercel.
+7. Fazer o primeiro deploy.
+8. Copiar o endereço do deploy para as URLs permitidas do Supabase Auth.
+9. Testar cadastro, login, upload, transcrição e persistência.
+
+### Responsabilidades
+
+**Everton:** criar/administrar as contas Supabase, Groq e Vercel e cadastrar os segredos diretamente nos painéis.
+
+**Codex:** implementar o código, atualizar esta vistoria, verificar lint/build, sincronizar Git e orientar os testes. Segredos não serão incluídos em commits.
+
 ## Objetivo do produto
 
 Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arquivo de áudio. O sistema transcreve o áudio em nuvem, cria uma memória estruturada com resumo, tópicos, decisões e tarefas, e permite ao usuário revisar, editar e exportar o resultado.
@@ -64,7 +128,8 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 
 ### Groq e processamento
 
-- [ ] `GROQ_API_KEY` configurada no ambiente
+- [x] `GROQ_API_KEY` configurada no ambiente local
+- [ ] `GROQ_API_KEY` configurada na Vercel para Preview e Production
 - [ ] Cliente Groq somente no servidor
 - [ ] Transcrição do áudio em nuvem
 - [ ] Geração de título e resumo
@@ -107,6 +172,16 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [ ] Fluxo completo testado em produção
 - [ ] Monitoramento de erros
 - [ ] Domínio personalizado
+
+## Ações necessárias do proprietário
+
+- [ ] Criar o projeto no Supabase
+- [ ] Adicionar URL e anon key do Supabase ao `.env.local`
+- [ ] Criar o bucket privado `meeting-audios`
+- [ ] Aplicar o schema no Supabase
+- [ ] Criar ou importar o projeto na Vercel
+- [ ] Adicionar as três variáveis à Vercel
+- [ ] Informar quando Supabase e Vercel estiverem configurados para o teste ponta a ponta
 
 ## Próximo marco — MVP funcional
 
