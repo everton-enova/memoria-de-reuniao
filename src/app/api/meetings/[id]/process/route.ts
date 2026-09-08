@@ -61,6 +61,7 @@ async function createMemory(transcript: string): Promise<Memory> {
 
 export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  console.info("[meeting-process] request received", { meetingId: id });
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Não autenticado." }, { status: 401 });
@@ -70,6 +71,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
   if (!meeting?.audio_path) return NextResponse.json({ error: "Áudio não encontrado." }, { status: 404 });
 
   try {
+    console.info("[meeting-process] starting transcription", { meetingId: id });
     await supabase.from("meetings").update({ processing_status: "transcribing", processing_error: null }).eq("id", id);
     const { data: audio, error: downloadError } = await supabase.storage.from("meeting-audios").download(meeting.audio_path);
     if (downloadError || !audio) throw new Error("Não foi possível acessar o áudio privado.");
@@ -88,14 +90,17 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
     if (!transcription.text?.trim()) throw new Error("Nenhuma fala foi identificada no áudio.");
 
     await supabase.from("meetings").update({ transcript: transcription.text, processing_status: "organizing" }).eq("id", id);
+    console.info("[meeting-process] transcription completed", { meetingId: id, characters: transcription.text.length });
     let memory: Memory = { summary: "Transcrição concluída. A organização automática não foi disponibilizada.", decisions: [], action_items: [] };
     try { memory = await createMemory(transcription.text); } catch { /* A transcrição continua disponível mesmo se o resumo falhar. */ }
 
     await supabase.from("meetings").update({ summary: memory.summary, status: "completed", processing_status: "completed", processing_error: null }).eq("id", id);
     if (memory.decisions.length) await supabase.from("decisions").insert(memory.decisions.map((content) => ({ meeting_id: id, content })));
     if (memory.action_items.length) await supabase.from("action_items").insert(memory.action_items.map((item) => ({ meeting_id: id, ...item })));
+    console.info("[meeting-process] memory completed", { meetingId: id });
     return NextResponse.json({ ok: true });
   } catch (error) {
+    console.error("[meeting-process] failed", { meetingId: id, error: safeError(error) });
     await supabase.from("meetings").update({ processing_status: "failed", processing_error: safeError(error) }).eq("id", id);
     return NextResponse.json({ error: safeError(error) }, { status: 500 });
   }

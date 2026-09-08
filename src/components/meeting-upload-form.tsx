@@ -8,7 +8,12 @@ import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
 
 const MAX_AUDIO_BYTES = 25 * 1024 * 1024;
-const ACCEPTED_TYPES = ["audio/mpeg", "audio/mp4", "audio/wav", "audio/x-wav", "audio/webm", "audio/ogg"];
+const ACCEPTED_TYPES = ["audio/mpeg", "audio/mp4", "audio/x-m4a", "audio/wav", "audio/x-wav", "audio/webm", "audio/ogg"];
+
+function messageFrom(error: unknown) {
+  const detail = error instanceof Error ? error.message : "Erro inesperado.";
+  return `Não foi possível concluir o envio. ${detail}`;
+}
 
 export function MeetingUploadForm() {
   const router = useRouter();
@@ -26,55 +31,56 @@ export function MeetingUploadForm() {
     setSubmitting(true);
     setMessage("Preparando o envio seguro do áudio...");
 
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
+    try {
+      const supabase = createClient();
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError) throw userError;
+      if (!user) {
+        router.replace("/login");
+        return;
+      }
 
-    const meetingId = crypto.randomUUID();
-    const extension = file.name.split(".").pop()?.toLowerCase() || "webm";
-    const path = `${user.id}/${meetingId}.${extension}`;
-    const meetingTitle = title.trim() || `Reunião de ${new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium" }).format(new Date())}`;
+      const meetingId = crypto.randomUUID();
+      const extension = file.name.split(".").pop()?.toLowerCase() || "webm";
+      const path = `${user.id}/${meetingId}.${extension}`;
+      const meetingTitle = title.trim() || `Reunião de ${new Intl.DateTimeFormat("pt-BR", { dateStyle: "medium" }).format(new Date())}`;
+      const mimeType = file.type === "audio/x-m4a" ? "audio/mp4" : file.type;
 
-    const { error: meetingError } = await supabase.from("meetings").insert({
-      id: meetingId,
-      owner_id: user.id,
-      title: meetingTitle,
-      processing_status: "draft",
-    });
-    if (meetingError) {
+      const { error: meetingError } = await supabase.from("meetings").insert({
+        id: meetingId,
+        owner_id: user.id,
+        title: meetingTitle,
+        processing_status: "draft",
+      });
+      if (meetingError) throw meetingError;
+
+      const { error: uploadError } = await supabase.storage.from("meeting-audios").upload(path, file, {
+        contentType: mimeType,
+        upsert: false,
+      });
+      if (uploadError) throw uploadError;
+
+      const { error: metadataError } = await supabase.from("meetings").update({
+        audio_path: path,
+        audio_mime_type: mimeType,
+        audio_size_bytes: file.size,
+        processing_status: "uploaded",
+      }).eq("id", meetingId);
+      if (metadataError) throw metadataError;
+
+      setMessage("Transcrevendo e organizando a memória da reunião...");
+      const response = await fetch(`/api/meetings/${meetingId}/process`, { method: "POST" });
+      const result = await response.json().catch(() => ({})) as { error?: string };
+      if (!response.ok) throw new Error(result.error ?? "O áudio foi salvo, mas o processamento falhou.");
+
+      router.push(`/meetings/${meetingId}`);
+      router.refresh();
+    } catch (error) {
+      console.error("[meeting-upload] failed", error);
+      setMessage(messageFrom(error));
+    } finally {
       setSubmitting(false);
-      return setMessage("Não foi possível criar o registro da reunião. Tente novamente.");
     }
-
-    const { error: uploadError } = await supabase.storage.from("meeting-audios").upload(path, file, {
-      contentType: file.type,
-      upsert: false,
-    });
-    if (uploadError) {
-      await supabase.from("meetings").delete().eq("id", meetingId);
-      setSubmitting(false);
-      return setMessage("Não foi possível enviar o áudio. Tente novamente.");
-    }
-
-    await supabase.from("meetings").update({
-      audio_path: path,
-      audio_mime_type: file.type,
-      audio_size_bytes: file.size,
-      processing_status: "uploaded",
-    }).eq("id", meetingId);
-
-    setMessage("Transcrevendo e organizando a memória da reunião...");
-    const response = await fetch(`/api/meetings/${meetingId}/process`, { method: "POST" });
-    if (!response.ok) {
-      setSubmitting(false);
-      return setMessage("O áudio foi salvo, mas houve falha no processamento. Abra a reunião e tente novamente.");
-    }
-
-    router.push(`/meetings/${meetingId}`);
-    router.refresh();
   }
 
   return (
