@@ -151,6 +151,7 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 ### Memória da reunião
 
 - [ ] Página de detalhe da reunião
+- [x] Memória executiva com objetivo, pontos, decisões, encaminhamentos e pendências
 - [ ] Editor da transcrição
 - [ ] Editor do resumo
 - [ ] CRUD de decisões
@@ -159,7 +160,8 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [ ] Marcação de tarefas concluídas
 - [ ] Busca no histórico
 - [ ] Exportação para Markdown
-- [ ] Exportação para PDF
+- [x] Exportação para Markdown
+- [x] Impressão para PDF pelo navegador
 
 ### Segurança e privacidade
 
