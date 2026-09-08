@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { Archive, ArrowUpRight, Building2, CalendarDays, ClipboardCheck, Clock3, FileAudio, FileText, ListChecks, Mic2, Plus, Search, ShieldCheck, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -39,7 +40,7 @@ export default async function Home() {
       <header className="sticky top-0 z-20 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
         <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-4 sm:px-6">
           <div className="flex min-w-0 items-center gap-3"><div className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground"><Mic2 className="size-5" /></div><div className="min-w-0"><p className="truncate text-sm font-semibold">Memória de Reuniões</p><p className="truncate text-xs text-muted-foreground">Ambiente institucional</p></div></div>
-          <div className="flex items-center gap-2"><Button variant="outline" className="hidden sm:inline-flex"><FileAudio /> Importar áudio</Button><Button><Plus /> Nova reunião</Button><div aria-label={`Perfil de ${user.email ?? "usuário"}`} className="ml-1 grid size-9 place-items-center rounded-full border bg-muted text-xs font-semibold">{profileInitials}</div></div>
+          <div className="flex items-center gap-2"><Button asChild variant="outline" className="hidden sm:inline-flex"><Link href="/meetings/new"><FileAudio /> Importar áudio</Link></Button><Button asChild><Link href="/meetings/new"><Plus /> Nova reunião</Link></Button><div aria-label={`Perfil de ${user.email ?? "usuário"}`} className="ml-1 grid size-9 place-items-center rounded-full border bg-muted text-xs font-semibold">{profileInitials}</div></div>
         </div>
       </header>
 
@@ -64,7 +65,7 @@ export default async function Home() {
             <Card><CardHeader><div className="flex items-center justify-between"><CardTitle>Encaminhamentos</CardTitle><Badge variant="secondary">4 abertos</Badge></div><CardDescription>Prazos e responsáveis prioritários</CardDescription></CardHeader><CardContent className="space-y-1">{tasks.map((task, index) => <Task key={task.title} {...task} urgent={index < 2} />)}<Button variant="outline" className="mt-4 w-full">Ver todos os encaminhamentos</Button></CardContent></Card>
           </div>
 
-          <Card className="mt-6 border-primary/20 bg-primary/[0.035]"><CardContent className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex gap-4"><div className="grid size-11 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground"><Mic2 className="size-5" /></div><div><h2 className="font-semibold">Registrar uma nova reunião</h2><p className="mt-1 text-sm text-muted-foreground">Grave pelo navegador ou envie um arquivo de áudio para gerar a memória automaticamente.</p></div></div><Button size="lg">Iniciar registro <ArrowUpRight /></Button></CardContent></Card>
+          <Card className="mt-6 border-primary/20 bg-primary/[0.035]"><CardContent className="flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex gap-4"><div className="grid size-11 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground"><Mic2 className="size-5" /></div><div><h2 className="font-semibold">Registrar uma nova reunião</h2><p className="mt-1 text-sm text-muted-foreground">Grave pelo navegador ou envie um arquivo de áudio para gerar a memória automaticamente.</p></div></div><Button asChild size="lg"><Link href="/meetings/new">Iniciar registro <ArrowUpRight /></Link></Button></CardContent></Card>
         </section>
       </div>
     </main>

@@ -12,7 +12,7 @@
 | Groq produção | Configurado | Implementar e testar a transcrição |
 | Supabase | Configurado e verificado | Concluir os templates e teste de e-mail em produção |
 | Vercel | Publicado | Manter deploy automático pela `main` |
-| Áudio e transcrição | Não iniciado | Implementar depois das integrações |
+| Áudio e transcrição | Implementado no código | Validar um áudio real em produção |
 
 ## Fluxo dos ambientes e das chaves
 
@@ -130,7 +130,7 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [ ] Prévia do áudio antes do envio
 - [ ] Upload de MP3, M4A, WAV, WebM e OGG
 - [ ] Validação de formato, tamanho e duração
-- [ ] Upload direto para o Supabase Storage
+- [x] Upload direto para o Supabase Storage
 - [ ] Player para ouvir o áudio salvo
 - [ ] Exclusão segura do áudio
 
@@ -138,11 +138,11 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 
 - [x] `GROQ_API_KEY` configurada no ambiente local
 - [x] `GROQ_API_KEY` configurada na Vercel para Preview e Production
-- [ ] Cliente Groq somente no servidor
-- [ ] Transcrição do áudio em nuvem
-- [ ] Geração de título e resumo
-- [ ] Extração estruturada de tópicos e decisões
-- [ ] Extração de tarefas, responsáveis e prazos
+- [x] Cliente Groq somente no servidor
+- [x] Transcrição do áudio em nuvem
+- [x] Geração de resumo
+- [x] Extração estruturada de decisões
+- [x] Extração de tarefas, responsáveis e prazos
 - [ ] Status `uploaded`, `transcribing`, `organizing`, `completed` e `failed`
 - [ ] Registro seguro de erros e opção de tentar novamente
 - [ ] Estratégia assíncrona para reuniões longas
@@ -214,3 +214,4 @@ O MVP estará concluído quando um usuário puder criar uma conta, gravar ou env
 | 04/09/2026 | Supabase remoto | 4 tabelas públicas verificadas; bucket privado `meeting-audios` com 4 políticas, limite de 200 MB e 6 MIME types |
 | 04/09/2026 | Interface institucional Radix/shadcn | Lint e build aprovados; renderização local verificada sem erros no navegador |
 | 08/09/2026 | Primeiro acesso | Rota de callback e redirecionamento de confirmação implementados; pendente salvar e testar configuração no Supabase |
+| 08/09/2026 | Fluxo de áudio | Upload privado, transcrição Groq, resumo estruturado e visualização da reunião implementados; pendente teste com áudio real em produção |
