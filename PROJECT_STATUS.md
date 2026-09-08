@@ -101,6 +101,7 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [x] Tela de login e cadastro
 - [x] Dashboard reposicionado para uso institucional no setor público
 - [x] Tela de acesso com linguagem institucional
+- [x] Dashboard protegido: acesso sem sessão redireciona para login
 - [ ] Dashboard conectado aos dados reais do Supabase
 - [ ] Estados de carregamento, vazio e erro
 - [ ] Navegação mobile completa
