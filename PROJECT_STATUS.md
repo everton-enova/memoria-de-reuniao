@@ -10,7 +10,7 @@
 | GitHub | Concluído | Manter `main` sincronizada a cada sessão |
 | Groq local | Configurado | Implementar e testar o cliente de transcrição |
 | Groq produção | Configurado | Implementar e testar a transcrição |
-| Supabase | Configurado e verificado | Integrar dados reais e upload de áudio |
+| Supabase | Configurado e verificado | Concluir os templates e teste de e-mail em produção |
 | Vercel | Publicado | Manter deploy automático pela `main` |
 | Áudio e transcrição | Não iniciado | Implementar depois das integrações |
 
@@ -118,7 +118,8 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [x] Bucket privado `meeting-audios` criado com limite de 200 MB e allowlist de áudio
 - [x] Quatro políticas RLS do Storage criadas e verificadas
 - [x] Renovação de sessão configurada
-- [ ] Callback de confirmação de e-mail configurado
+- [x] Callback de confirmação de e-mail implementado no app
+- [ ] Templates e URLs de Auth aplicados e testados no Supabase
 - [ ] Logout implementado
 
 ### Áudio
@@ -174,7 +175,7 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [x] Projeto criado na Vercel
 - [x] Variáveis configuradas em Preview e Production
 - [x] Primeiro deploy publicado
-- [ ] URLs de autenticação configuradas no Supabase
+- [ ] URLs e templates de autenticação configurados no Supabase
 - [ ] Fluxo completo testado em produção
 - [ ] Monitoramento de erros
 - [ ] Domínio personalizado
@@ -211,3 +212,4 @@ O MVP estará concluído quando um usuário puder criar uma conta, gravar ou env
 | 04/09/2026 | `pnpm build` | Aprovado — rotas `/` e `/login` |
 | 04/09/2026 | Supabase remoto | 4 tabelas públicas verificadas; bucket privado `meeting-audios` com 4 políticas, limite de 200 MB e 6 MIME types |
 | 04/09/2026 | Interface institucional Radix/shadcn | Lint e build aprovados; renderização local verificada sem erros no navegador |
+| 08/09/2026 | Primeiro acesso | Rota de callback e redirecionamento de confirmação implementados; pendente salvar e testar configuração no Supabase |
