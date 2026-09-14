@@ -1,16 +1,16 @@
 # Vistoria do projeto — Memória de Reunião
 
-Última atualização: 14 de setembro de 2026
+Última atualização: 14 de setembro de 2026 (segunda revisão)
 
 ## Resumo executivo
 
 | Área | Estado | Próxima ação |
 | --- | --- | --- |
-| Código-base | Concluído | Implementar a edição da memória gerada |
+| Código-base | Concluído | Validar o fluxo completo com um áudio real |
 | GitHub | Concluído | Manter `main` sincronizada a cada sessão |
 | Groq local | Configurado | Validar um áudio real |
 | Groq produção | Configurado | Validar um áudio real |
-| Supabase | Configurado e verificado | Reaplicar `schema.sql` e concluir os templates de e-mail |
+| Supabase | Configurado e verificado | Concluir os templates e URLs de e-mail |
 | Vercel | Publicado | Manter deploy automático pela `main` |
 | Áudio e transcrição | Implementado com gravação, retomada e histórico | Validar um áudio real em produção |
 
@@ -49,7 +49,7 @@ Regras:
 ### Fluxo completo de configuração
 
 1. Criar o projeto no Supabase. **Concluído.**
-2. Executar `supabase/schema.sql` no SQL Editor. **Concluído em 04/09/2026; reaplicar após a revisão de 14/09.**
+2. Executar `supabase/schema.sql` no SQL Editor. **Concluído; reaplicado em 14/09/2026 com o schema idempotente.**
 3. Criar o bucket privado `meeting-audios`. **Concluído pelo script.**
 4. Copiar URL e anon key do Supabase para `.env.local`. **Concluído.**
 5. Importar o repositório do GitHub na Vercel. **Concluído.**
@@ -121,6 +121,7 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [x] Renovação de sessão configurada
 - [x] Callback de confirmação de e-mail implementado no app
 - [x] `schema.sql` idempotente: políticas e trigger podem ser reaplicados
+- [x] `schema.sql` reaplicado no projeto remoto em 14/09/2026
 - [x] Limite do bucket alinhado ao limite real de transcrição (25 MB)
 - [x] Logout implementado
 - [ ] Templates e URLs de Auth aplicados e testados no Supabase
@@ -160,15 +161,16 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 
 - [x] Página de detalhe da reunião
 - [x] Memória executiva com objetivo, pontos, decisões, encaminhamentos e pendências
-- [x] Marcação de tarefas concluídas pelo painel
+- [x] Marcação de tarefas concluídas pelo painel e pela reunião
 - [x] Busca no histórico
 - [x] Exportação para Markdown
 - [x] Impressão para PDF pelo navegador
-- [ ] Editor da transcrição
-- [ ] Editor do resumo
-- [ ] CRUD de decisões
-- [ ] CRUD de tarefas
-- [ ] CRUD de participantes
+- [x] Editor da transcrição
+- [x] Editor do resumo
+- [x] Editor do assunto, do objetivo, dos pontos discutidos e dos pontos de validação
+- [x] CRUD de decisões
+- [x] CRUD de tarefas, com responsável e prazo
+- [x] CRUD de participantes
 
 ### Segurança e privacidade
 
@@ -199,7 +201,7 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [x] Aplicar o schema no Supabase
 - [x] Criar ou importar o projeto na Vercel
 - [x] Adicionar as variáveis à Vercel
-- [ ] Reaplicar `supabase/schema.sql` para ajustar o limite do bucket para 25 MB
+- [x] Reaplicar `supabase/schema.sql` para ajustar o limite do bucket para 25 MB
 - [ ] Configurar as URLs permitidas e os templates de e-mail no Supabase Auth
 - [ ] Fazer o teste ponta a ponta com um áudio real em produção
 
@@ -211,8 +213,8 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 4. Implementar transcrição Groq. **Concluído.**
 5. Gerar e persistir a memória estruturada. **Concluído.**
 6. Reencontrar as reuniões pelo histórico. **Concluído.**
-7. Criar a página de revisão e edição. **Pendente.**
-8. Validar o fluxo de ponta a ponta em produção. **Pendente.**
+7. Criar a página de revisão e edição. **Concluído.**
+8. Validar o fluxo de ponta a ponta em produção. **Pendente — depende de um áudio real.**
 
 ## Critério de conclusão do MVP
 
@@ -233,3 +235,4 @@ O MVP estará concluído quando um usuário puder criar uma conta, gravar ou env
 | 14/09/2026 | Proteção de rotas | `/` e `/meetings/new` sem sessão respondem 307 para `/login` |
 | 14/09/2026 | Funções de data, status e áudio | 30 casos executados, todos aprovados, incluindo fuso de São Paulo |
 | 14/09/2026 | Fluxo autenticado ponta a ponta | **Não executado** — sem sessão nem chaves neste ambiente |
+| 14/09/2026 | Camada de edição da memória | `pnpm lint` e `pnpm build` aprovados; rotas protegidas seguem respondendo 307; nenhum erro no log do servidor |

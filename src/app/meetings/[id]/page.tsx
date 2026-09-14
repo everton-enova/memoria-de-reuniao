@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MeetingExportActions } from "@/components/meeting-export-actions";
 import { MeetingProcessingPanel } from "@/components/meeting-processing-panel";
+import { MeetingEditableField } from "@/components/meeting-editable-field";
+import { MeetingListEditor } from "@/components/meeting-list-editor";
+import { MeetingActionItemsEditor, type ActionItem } from "@/components/meeting-action-items-editor";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime, statusLabel, type ProcessingStatus } from "@/lib/meetings";
 
@@ -23,9 +26,9 @@ export default async function MeetingPage({ params }: PageProps<"/meetings/[id]"
 
   const [{ data: meeting }, { data: participants }, { data: decisions }, { data: actions }] = await Promise.all([
     supabase.from("meetings").select("id,title,occurred_at,updated_at,duration_minutes,notes,processing_status,processing_error,transcript,summary").eq("id", id).single(),
-    supabase.from("participants").select("id,name").eq("meeting_id", id),
-    supabase.from("decisions").select("id,content").eq("meeting_id", id),
-    supabase.from("action_items").select("id,content,assignee,due_date").eq("meeting_id", id),
+    supabase.from("participants").select("id,name").eq("meeting_id", id).order("id"),
+    supabase.from("decisions").select("id,content").eq("meeting_id", id).order("created_at"),
+    supabase.from("action_items").select("id,content,assignee,due_date,completed").eq("meeting_id", id).order("created_at"),
   ]);
   if (!meeting) notFound();
 
@@ -34,7 +37,8 @@ export default async function MeetingPage({ params }: PageProps<"/meetings/[id]"
   const notes = parseNotes(meeting.notes);
   const participantNames = participants?.map((participant) => participant.name) ?? [];
   const decisionContents = decisions?.map((decision) => decision.content) ?? [];
-  const exportActions = actions?.map((action) => ({ content: action.content, assignee: action.assignee, dueDate: action.due_date })) ?? [];
+  const actionItems = (actions ?? []) as ActionItem[];
+  const exportActions = actionItems.map((action) => ({ content: action.content, assignee: action.assignee, dueDate: action.due_date }));
 
   return (
     <main className="min-h-screen bg-muted/30 p-5 sm:p-8">
@@ -44,7 +48,9 @@ export default async function MeetingPage({ params }: PageProps<"/meetings/[id]"
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-sm text-muted-foreground">MEMÓRIA EXECUTIVA DA REUNIÃO</p>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">{meeting.title}</h1>
+            <MeetingEditableField meetingId={meeting.id} field="title" value={meeting.title} singleLine>
+              <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">{meeting.title}</h1>
+            </MeetingEditableField>
             <p className="mt-2 text-sm text-muted-foreground">
               {formatDateTime(meeting.occurred_at)}{meeting.duration_minutes ? ` · Duração: ${meeting.duration_minutes} min` : ""}
             </p>
@@ -71,54 +77,64 @@ export default async function MeetingPage({ params }: PageProps<"/meetings/[id]"
 
             <Card>
               <CardHeader><div className="flex items-center gap-2"><FileText className="size-5 text-primary" /><CardTitle>Objetivo e pauta</CardTitle></div></CardHeader>
-              <CardContent><p className="whitespace-pre-wrap text-sm leading-6">{notes.objective ?? "Não identificado automaticamente."}</p></CardContent>
+              <CardContent>
+                <MeetingEditableField meetingId={meeting.id} field="objective" value={notes.objective ?? ""} rows={4}>
+                  <p className="whitespace-pre-wrap text-sm leading-6">{notes.objective || "Não identificado automaticamente."}</p>
+                </MeetingEditableField>
+              </CardContent>
             </Card>
 
             <Card>
               <CardHeader><CardTitle>Participantes</CardTitle></CardHeader>
               <CardContent>
-                {participantNames.length ? <p className="text-sm leading-6">{participantNames.join(", ")}</p> : <p className="text-sm text-muted-foreground">Não identificados automaticamente.</p>}
+                <MeetingListEditor
+                  meetingId={meeting.id}
+                  kind="participant"
+                  items={participants?.map((participant) => ({ id: participant.id, content: participant.name })) ?? []}
+                  emptyLabel="Não identificados automaticamente."
+                  placeholder="Adicionar participante"
+                />
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader><CardTitle>Principais pontos discutidos</CardTitle></CardHeader>
               <CardContent>
-                {notes.main_points?.length
-                  ? <ul className="space-y-3">{notes.main_points.map((point) => <li className="flex gap-2 text-sm leading-6" key={point}><CheckCircle2 className="mt-1 size-4 shrink-0 text-primary" />{point}</li>)}</ul>
-                  : <p className="text-sm text-muted-foreground">Não identificados automaticamente.</p>}
+                <MeetingEditableField meetingId={meeting.id} field="main_points" value={(notes.main_points ?? []).join("\n")} rows={6} hint="Um ponto por linha.">
+                  {notes.main_points?.length
+                    ? <ul className="space-y-3">{notes.main_points.map((point) => <li className="flex gap-2 text-sm leading-6" key={point}><CheckCircle2 className="mt-1 size-4 shrink-0 text-primary" />{point}</li>)}</ul>
+                    : <p className="text-sm text-muted-foreground">Não identificados automaticamente.</p>}
+                </MeetingEditableField>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader><CardTitle>Síntese executiva</CardTitle><CardDescription>Resumo objetivo gerado a partir do áudio.</CardDescription></CardHeader>
-              <CardContent><p className="whitespace-pre-wrap text-sm leading-6">{meeting.summary}</p></CardContent>
+              <CardContent>
+                <MeetingEditableField meetingId={meeting.id} field="summary" value={meeting.summary ?? ""} rows={8}>
+                  <p className="whitespace-pre-wrap text-sm leading-6">{meeting.summary}</p>
+                </MeetingEditableField>
+              </CardContent>
             </Card>
 
             <div className="grid gap-6 md:grid-cols-2">
               <Card>
                 <CardHeader><div className="flex items-center gap-2"><ClipboardCheck className="size-5 text-primary" /><CardTitle>Decisões e alinhamentos</CardTitle></div></CardHeader>
                 <CardContent>
-                  {decisions?.length
-                    ? <ul className="space-y-3">{decisions.map((decision) => <li className="flex gap-2 text-sm" key={decision.id}><CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />{decision.content}</li>)}</ul>
-                    : <p className="text-sm text-muted-foreground">Nenhuma decisão explícita identificada.</p>}
+                  <MeetingListEditor
+                    meetingId={meeting.id}
+                    kind="decision"
+                    items={decisions ?? []}
+                    emptyLabel="Nenhuma decisão explícita identificada."
+                    placeholder="Adicionar decisão"
+                  />
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader><div className="flex items-center gap-2"><ListChecks className="size-5 text-primary" /><CardTitle>Encaminhamentos</CardTitle></div></CardHeader>
                 <CardContent>
-                  {actions?.length
-                    ? <ul className="space-y-3">{actions.map((action) => (
-                        <li className="text-sm" key={action.id}>
-                          <p className="font-medium">{action.content}</p>
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            {action.assignee ?? "Responsável não identificado"}
-                            {action.due_date ? ` · prazo ${new Intl.DateTimeFormat("pt-BR").format(new Date(`${action.due_date}T12:00:00`))}` : ""}
-                          </p>
-                        </li>
-                      ))}</ul>
-                    : <p className="text-sm text-muted-foreground">Nenhum encaminhamento explícito identificado.</p>}
+                  <MeetingActionItemsEditor meetingId={meeting.id} items={actionItems} />
                 </CardContent>
               </Card>
             </div>
@@ -126,15 +142,21 @@ export default async function MeetingPage({ params }: PageProps<"/meetings/[id]"
             <Card>
               <CardHeader><CardTitle>Pontos que ainda precisam de validação</CardTitle></CardHeader>
               <CardContent>
-                {notes.validation_points?.length
-                  ? <ul className="space-y-3">{notes.validation_points.map((point) => <li className="flex gap-2 text-sm leading-6" key={point}><CheckCircle2 className="mt-1 size-4 shrink-0 text-primary" />{point}</li>)}</ul>
-                  : <p className="text-sm text-muted-foreground">Nenhum ponto pendente identificado.</p>}
+                <MeetingEditableField meetingId={meeting.id} field="validation_points" value={(notes.validation_points ?? []).join("\n")} rows={5} hint="Um ponto por linha.">
+                  {notes.validation_points?.length
+                    ? <ul className="space-y-3">{notes.validation_points.map((point) => <li className="flex gap-2 text-sm leading-6" key={point}><CheckCircle2 className="mt-1 size-4 shrink-0 text-primary" />{point}</li>)}</ul>
+                    : <p className="text-sm text-muted-foreground">Nenhum ponto pendente identificado.</p>}
+                </MeetingEditableField>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader><CardTitle>Transcrição</CardTitle><CardDescription>Texto extraído do áudio original.</CardDescription></CardHeader>
-              <CardContent><p className="whitespace-pre-wrap text-sm leading-6 text-muted-foreground">{meeting.transcript}</p></CardContent>
+              <CardContent>
+                <MeetingEditableField meetingId={meeting.id} field="transcript" value={meeting.transcript ?? ""} rows={14}>
+                  <p className="whitespace-pre-wrap text-sm leading-6 text-muted-foreground">{meeting.transcript}</p>
+                </MeetingEditableField>
+              </CardContent>
             </Card>
           </div>
         )}
