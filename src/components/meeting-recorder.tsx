@@ -12,6 +12,13 @@ const PREFERRED_TYPES = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "a
 /** Intervalo entre barras da onda. Mais curto que isso, a onda rola rápido demais para ser lida. */
 const SAMPLE_INTERVAL_MS = 55;
 
+/**
+ * A Groq reduz todo áudio a 16 kHz mono antes de transcrever, então gravar
+ * acima disso só gasta o limite de tamanho. Medido em Chromium: o padrão de
+ * 128 kbps rende 30 min dentro de 25 MB; 32 kbps mono rende algumas horas.
+ */
+const AUDIO_BITS_PER_SECOND = 32_000;
+
 type RecorderStatus = "idle" | "recording" | "paused" | "ready";
 
 function supportedMimeType() {
@@ -114,9 +121,9 @@ export function MeetingRecorder({ onRecorded, disabled }: { onRecorded: (file: F
       return;
     }
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } });
       const mimeType = supportedMimeType();
-      const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+      const recorder = new MediaRecorder(stream, { ...(mimeType ? { mimeType } : {}), audioBitsPerSecond: AUDIO_BITS_PER_SECOND });
       chunksRef.current = [];
 
       recorder.ondataavailable = (event) => { if (event.data.size) chunksRef.current.push(event.data); };

@@ -37,6 +37,7 @@ Local usado: **Vercel → projeto → Settings → Environment Variables**.
 | `NEXT_PUBLIC_SUPABASE_URL` | Não | Development, Preview e Production | Supabase Project Settings → API |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Chave pública com RLS | Development, Preview e Production | Supabase Project Settings → API |
 | `NEXT_PUBLIC_SITE_URL` | Não | Preview e Production (opcional) | Endereço público do deploy |
+| `NEXT_PUBLIC_MAX_AUDIO_MB` | Não | Todos (opcional) | 25 no plano gratuito da Groq, 100 no plano dev |
 
 Regras:
 
@@ -122,7 +123,7 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [x] Callback de confirmação de e-mail implementado no app
 - [x] `schema.sql` idempotente: políticas e trigger podem ser reaplicados
 - [x] `schema.sql` reaplicado no projeto remoto em 14/09/2026
-- [x] Limite do bucket alinhado ao limite real de transcrição (25 MB)
+- [x] Bucket no teto físico da Groq (100 MB); o limite por plano fica na aplicação
 - [x] Logout implementado
 - [ ] Templates e URLs de Auth aplicados e testados no Supabase
 
@@ -132,8 +133,10 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [x] Pausar, continuar, encerrar e descartar gravação
 - [x] Onda de áudio ao vivo durante a gravação, congelada ao pausar
 - [x] Onda completa da gravação exibida ao encerrar
+- [x] Gravação em mono a 32 kbps, alinhada ao 16 kHz mono usado na transcrição
+- [x] Limite de tamanho configurável por ambiente, com mensagem que explica como reduzir o arquivo
 - [x] Prévia do áudio antes do envio
-- [x] Upload de MP3, M4A, WAV, WebM e OGG
+- [x] Upload de MP3, M4A, WAV, FLAC, WebM e OGG
 - [x] Remover o arquivo escolhido antes de enviar
 - [x] Validação de formato e tamanho
 - [x] Upload direto para o Supabase Storage
@@ -239,4 +242,5 @@ O MVP estará concluído quando um usuário puder criar uma conta, gravar ou env
 | 14/09/2026 | Funções de data, status e áudio | 30 casos executados, todos aprovados, incluindo fuso de São Paulo |
 | 14/09/2026 | Fluxo autenticado ponta a ponta | **Não executado** — sem sessão nem chaves neste ambiente |
 | 14/09/2026 | Camada de edição da memória | `pnpm lint` e `pnpm build` aprovados; rotas protegidas seguem respondendo 307; nenhum erro no log do servidor |
+| 14/09/2026 | Tamanho de áudio | Bitrate de gravação medido em Chromium com microfone falso: 128 kbps = 30 min em 25 MB; 32 kbps = mais de 2 h. Limite configurável conferido no bundle do cliente |
 | 14/09/2026 | Onda de áudio | 11 casos das funções de desenho aprovados; renderização conferida em Chromium headless — 142 barras, alturas de 2 a 56 px em 36 níveis distintos |

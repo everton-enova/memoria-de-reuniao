@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MeetingRecorder } from "@/components/meeting-recorder";
 import { createClient } from "@/lib/supabase/client";
-import { ACCEPTED_MIME_TYPES, MAX_AUDIO_BYTES, baseMimeType, extensionFor, isAcceptedAudio } from "@/lib/audio";
+import { ACCEPTED_MIME_TYPES, MAX_AUDIO_BYTES, MAX_AUDIO_MB, baseMimeType, extensionFor, isAcceptedAudio } from "@/lib/audio";
 import { cn } from "@/lib/utils";
 
 type Mode = "record" | "upload";
@@ -45,8 +45,13 @@ export function MeetingUploadForm() {
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!file) return setMessage(mode === "record" ? "Grave e encerre um áudio para continuar." : "Selecione um arquivo de áudio para continuar.");
-    if (!isAcceptedAudio(file.type)) return setMessage("Envie um arquivo MP3, M4A, WAV, WebM ou OGG.");
-    if (file.size > MAX_AUDIO_BYTES) return setMessage("No plano atual, o áudio deve ter no máximo 25 MB.");
+    if (!isAcceptedAudio(file.type)) return setMessage("Envie um arquivo MP3, M4A, WAV, FLAC, WebM ou OGG.");
+    if (file.size > MAX_AUDIO_BYTES) {
+      return setMessage(
+        `Este arquivo tem ${(file.size / 1024 / 1024).toFixed(1)} MB e o limite atual é ${MAX_AUDIO_MB} MB. `
+        + "A transcrição reduz tudo a 16 kHz mono, então converter o arquivo para esse formato costuma resolver sem perda de qualidade — ou grave pelo aplicativo, que já usa um formato compacto.",
+      );
+    }
 
     setSubmitting(true);
     setMessage("Preparando o envio seguro do áudio...");
@@ -123,8 +128,8 @@ export function MeetingUploadForm() {
       ) : (
         <label className="grid gap-2 text-sm font-medium">
           Arquivo de áudio
-          <Input ref={fileInputRef} type="file" accept={`${ACCEPTED_MIME_TYPES.join(",")},.mp3,.m4a,.wav,.webm,.ogg`} onChange={(event) => setFile(event.target.files?.[0] ?? null)} disabled={submitting} />
-          <span className="text-xs font-normal text-muted-foreground">MP3, M4A, WAV, WebM ou OGG · até 25 MB</span>
+          <Input ref={fileInputRef} type="file" accept={`${ACCEPTED_MIME_TYPES.join(",")},.mp3,.m4a,.wav,.flac,.webm,.ogg`} onChange={(event) => setFile(event.target.files?.[0] ?? null)} disabled={submitting} />
+          <span className="text-xs font-normal text-muted-foreground">MP3, M4A, WAV, FLAC, WebM ou OGG · até {MAX_AUDIO_MB} MB</span>
         </label>
       )}
 

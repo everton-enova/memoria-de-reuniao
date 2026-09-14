@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { STALE_PROCESSING_MS } from "@/lib/meetings";
+import { MAX_AUDIO_BYTES, MAX_AUDIO_MB } from "@/lib/audio";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -117,7 +118,7 @@ export async function POST(_request: Request, { params }: { params: Promise<{ id
     console.info("[meeting-process] starting transcription", { meetingId: id });
     const { data: audio, error: downloadError } = await supabase.storage.from("meeting-audios").download(meeting.audio_path);
     if (downloadError || !audio) throw new Error("Não foi possível acessar o áudio privado.");
-    if (audio.size > 25 * 1024 * 1024) throw new Error("O áudio excede o limite de 25 MB para transcrição.");
+    if (audio.size > MAX_AUDIO_BYTES) throw new Error(`O áudio excede o limite de ${MAX_AUDIO_MB} MB para transcrição.`);
 
     const fileName = meeting.audio_path.split("/").pop() || "reuniao.webm";
     const form = new FormData();

@@ -23,8 +23,17 @@ O processamento roda dentro da requisição, com limite de 60 segundos na Vercel
 
 ## Limites atuais
 
-- Formatos aceitos: MP3, M4A, WAV, WebM e OGG.
-- Tamanho máximo: 25 MB, o mesmo limite aceito pela transcrição da Groq. O bucket aplica o mesmo teto.
+- Formatos aceitos: MP3, M4A, WAV, FLAC, WebM e OGG.
+- Tamanho máximo por áudio: **25 MB** por padrão, que é o teto da Groq no plano gratuito. No plano dev o teto é 100 MB: defina `NEXT_PUBLIC_MAX_AUDIO_MB=100` e faça um novo deploy. O bucket já aceita 100 MB, então não é preciso reexecutar o schema.
+- A transcrição reduz todo áudio a **16 kHz mono** antes de processar. Gravar ou enviar acima disso não melhora o resultado, só gasta o limite de tamanho.
+- Por isso a gravação pelo navegador usa mono a 32 kbps. Medido em Chromium: o padrão anterior de 128 kbps cabia cerca de 30 minutos em 25 MB; a 32 kbps cabem algumas horas.
+- Arquivo grande demais? Converta antes de enviar, sem perda prática para a transcrição:
+
+  ```sh
+  ffmpeg -i entrada.mp3 -ar 16000 -ac 1 -c:a flac saida.flac
+  ```
+
+- O tamanho não é o único teto: o processamento roda dentro de uma requisição limitada a 60 segundos na Vercel. Reuniões muito longas podem estourar esse tempo e precisar de nova tentativa até a fila assíncrona existir.
 
 ## Deploy
 

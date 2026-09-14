@@ -63,8 +63,9 @@ values (
   'meeting-audios',
   'meeting-audios',
   false,
-  26214400, -- 25 MB: mesmo limite aceito pela transcrição da Groq
-  array['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/x-wav', 'audio/webm', 'audio/ogg']
+  104857600, -- 100 MB: teto da Groq no plano dev. O limite por plano é o da
+             -- aplicação, em NEXT_PUBLIC_MAX_AUDIO_MB, e não exige rodar este arquivo de novo.
+  array['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/x-wav', 'audio/webm', 'audio/ogg', 'audio/flac', 'audio/x-flac']
 )
 on conflict (id) do update set
   public = excluded.public,
