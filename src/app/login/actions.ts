@@ -10,6 +10,11 @@ function configured() {
   );
 }
 async function applicationOrigin() {
+  // Os cabeçalhos abaixo vêm do cliente. Em produção, prefira fixar o endereço em
+  // NEXT_PUBLIC_SITE_URL para o link de confirmação nunca apontar para outro host.
+  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (configured) return configured.replace(/\/$/, "");
+
   const requestHeaders = await headers();
   const origin = requestHeaders.get("origin");
   if (origin) return origin;

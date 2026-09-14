@@ -1,18 +1,18 @@
 # Vistoria do projeto — Memória de Reunião
 
-Última atualização: 4 de setembro de 2026
+Última atualização: 14 de setembro de 2026
 
 ## Resumo executivo
 
 | Área | Estado | Próxima ação |
 | --- | --- | --- |
-| Código-base | Concluído | Evoluir o dashboard demonstrativo para o fluxo real |
+| Código-base | Concluído | Implementar a edição da memória gerada |
 | GitHub | Concluído | Manter `main` sincronizada a cada sessão |
-| Groq local | Configurado | Implementar e testar o cliente de transcrição |
-| Groq produção | Configurado | Implementar e testar a transcrição |
-| Supabase | Configurado e verificado | Concluir os templates e teste de e-mail em produção |
+| Groq local | Configurado | Validar um áudio real |
+| Groq produção | Configurado | Validar um áudio real |
+| Supabase | Configurado e verificado | Reaplicar `schema.sql` e concluir os templates de e-mail |
 | Vercel | Publicado | Manter deploy automático pela `main` |
-| Áudio e transcrição | Implementado no código | Validar um áudio real em produção |
+| Áudio e transcrição | Implementado com gravação, retomada e histórico | Validar um áudio real em produção |
 
 ## Fluxo dos ambientes e das chaves
 
@@ -25,20 +25,18 @@ Arquivo usado: `.env.local`.
 - Fica apenas na máquina de desenvolvimento.
 - É carregado automaticamente pelo Next.js ao executar `pnpm dev`.
 - Está protegido pelo `.gitignore`.
-- Atualmente contém `GROQ_API_KEY` para os testes locais.
-- `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` estão configuradas.
+- Contém `GROQ_API_KEY`, `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
 
 ### Preview e produção
 
 Local usado: **Vercel → projeto → Settings → Environment Variables**.
-
-Cadastrar estas três variáveis na Vercel:
 
 | Variável | É segredo? | Ambientes | Origem |
 | --- | --- | --- | --- |
 | `GROQ_API_KEY` | Sim | Development, Preview e Production | Groq Console |
 | `NEXT_PUBLIC_SUPABASE_URL` | Não | Development, Preview e Production | Supabase Project Settings → API |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Chave pública com RLS | Development, Preview e Production | Supabase Project Settings → API |
+| `NEXT_PUBLIC_SITE_URL` | Não | Preview e Production (opcional) | Endereço público do deploy |
 
 Regras:
 
@@ -51,14 +49,14 @@ Regras:
 ### Fluxo completo de configuração
 
 1. Criar o projeto no Supabase. **Concluído.**
-2. Executar `supabase/schema.sql` no SQL Editor. **Concluído em 04/09/2026.**
+2. Executar `supabase/schema.sql` no SQL Editor. **Concluído em 04/09/2026; reaplicar após a revisão de 14/09.**
 3. Criar o bucket privado `meeting-audios`. **Concluído pelo script.**
-4. Copiar URL e anon key do Supabase para `.env.local`.
-5. Importar o repositório do GitHub na Vercel.
-6. Cadastrar as três variáveis no painel da Vercel.
-7. Fazer o primeiro deploy.
+4. Copiar URL e anon key do Supabase para `.env.local`. **Concluído.**
+5. Importar o repositório do GitHub na Vercel. **Concluído.**
+6. Cadastrar as variáveis no painel da Vercel. **Concluído.**
+7. Fazer o primeiro deploy. **Concluído.**
 8. Copiar o endereço do deploy para as URLs permitidas do Supabase Auth.
-9. Testar cadastro, login, upload, transcrição e persistência.
+9. Testar cadastro, login, gravação, upload, transcrição e persistência.
 
 ### Responsabilidades
 
@@ -88,22 +86,24 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [x] Design system shadcn/ui com primitivas Radix UI
 - [x] Metadados e idioma `pt-BR`
 - [x] `.env.example` criado
-- [x] README com instruções iniciais
+- [x] README com instruções atualizadas
 - [x] Lint aprovado
 - [x] Build de produção aprovado
+- [ ] Testes automatizados e verificação contínua no GitHub
 
 ### Interface
 
-- [x] Dashboard demonstrativo de reuniões
-- [x] Cards demonstrativos de métricas
-- [x] Lista demonstrativa de reuniões
-- [x] Lista demonstrativa de tarefas
 - [x] Tela de login e cadastro
 - [x] Dashboard reposicionado para uso institucional no setor público
 - [x] Tela de acesso com linguagem institucional
 - [x] Dashboard protegido: acesso sem sessão redireciona para login
-- [ ] Dashboard conectado aos dados reais do Supabase
-- [ ] Estados de carregamento, vazio e erro
+- [x] Dashboard conectado aos dados reais do Supabase
+- [x] Métricas calculadas a partir das reuniões da própria conta
+- [x] Lista de reuniões com link para a memória de cada uma
+- [x] Busca por assunto no histórico
+- [x] Estados vazios na lista de reuniões e de encaminhamentos
+- [x] Estado de erro com nova tentativa (`src/app/error.tsx`)
+- [x] Acompanhamento automático do processamento na página da reunião
 - [ ] Navegação mobile completa
 
 ### Supabase
@@ -116,22 +116,27 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [x] RLS inicial para isolamento por usuário
 - [x] Projeto Supabase provisionado e conectado localmente
 - [x] Migração aplicada em ambiente remoto
-- [x] Bucket privado `meeting-audios` criado com limite de 200 MB e allowlist de áudio
+- [x] Bucket privado `meeting-audios` com allowlist de áudio
 - [x] Quatro políticas RLS do Storage criadas e verificadas
 - [x] Renovação de sessão configurada
 - [x] Callback de confirmação de e-mail implementado no app
+- [x] `schema.sql` idempotente: políticas e trigger podem ser reaplicados
+- [x] Limite do bucket alinhado ao limite real de transcrição (25 MB)
+- [x] Logout implementado
 - [ ] Templates e URLs de Auth aplicados e testados no Supabase
-- [ ] Logout implementado
 
 ### Áudio
 
-- [ ] Gravação pelo microfone com `MediaRecorder`
-- [ ] Pausar, continuar, encerrar e descartar gravação
-- [ ] Prévia do áudio antes do envio
-- [ ] Upload de MP3, M4A, WAV, WebM e OGG
-- [ ] Validação de formato, tamanho e duração
+- [x] Gravação pelo microfone com `MediaRecorder`
+- [x] Pausar, continuar, encerrar e descartar gravação
+- [x] Prévia do áudio antes do envio
+- [x] Upload de MP3, M4A, WAV, WebM e OGG
+- [x] Validação de formato e tamanho
 - [x] Upload direto para o Supabase Storage
-- [ ] Player para ouvir o áudio salvo
+- [x] Extensão do arquivo derivada do tipo do áudio, não do nome enviado
+- [x] Reunião descartada quando o upload falha, sem registro órfão
+- [ ] Validação de duração
+- [ ] Player para ouvir o áudio já salvo
 - [ ] Exclusão segura do áudio
 
 ### Groq e processamento
@@ -143,35 +148,38 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [x] Geração de resumo
 - [x] Extração estruturada de decisões
 - [x] Extração de tarefas, responsáveis e prazos
-- [ ] Status `uploaded`, `transcribing`, `organizing`, `completed` e `failed`
-- [ ] Registro seguro de erros e opção de tentar novamente
-- [ ] Estratégia assíncrona para reuniões longas
+- [x] Status `uploaded`, `transcribing`, `organizing`, `completed` e `failed` visíveis na interface
+- [x] Registro seguro de erros e opção de tentar novamente
+- [x] Trava contra processamento simultâneo da mesma reunião
+- [x] Reprocessar substitui a memória anterior em vez de duplicá-la
+- [x] Processamento interrompido é detectado e pode ser retomado
+- [ ] Estratégia assíncrona para reuniões longas (hoje o limite é 60 s por requisição)
 - [ ] Limites de uso e proteção contra abuso
 
 ### Memória da reunião
 
-- [ ] Página de detalhe da reunião
+- [x] Página de detalhe da reunião
 - [x] Memória executiva com objetivo, pontos, decisões, encaminhamentos e pendências
+- [x] Marcação de tarefas concluídas pelo painel
+- [x] Busca no histórico
+- [x] Exportação para Markdown
+- [x] Impressão para PDF pelo navegador
 - [ ] Editor da transcrição
 - [ ] Editor do resumo
 - [ ] CRUD de decisões
 - [ ] CRUD de tarefas
 - [ ] CRUD de participantes
-- [ ] Marcação de tarefas concluídas
-- [ ] Busca no histórico
-- [ ] Exportação para Markdown
-- [x] Exportação para Markdown
-- [x] Impressão para PDF pelo navegador
 
 ### Segurança e privacidade
 
-- [x] Chave da Groq planejada apenas no servidor
-- [x] Bucket de áudio definido como privado na arquitetura
+- [x] Chave da Groq apenas no servidor
+- [x] Bucket de áudio privado, com pasta por usuário
+- [x] Endereço do link de confirmação fixável por `NEXT_PUBLIC_SITE_URL`
 - [ ] Termos de uso e política de privacidade
 - [ ] Exclusão de conta e dados
 - [ ] Política de retenção dos áudios
 - [ ] Auditoria completa das políticas RLS
-- [ ] Proteção e rate limiting das rotas de processamento
+- [ ] Rate limiting das rotas de processamento
 
 ### Deploy e operação
 
@@ -190,18 +198,21 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [x] Criar o bucket privado `meeting-audios`
 - [x] Aplicar o schema no Supabase
 - [x] Criar ou importar o projeto na Vercel
-- [x] Adicionar as três variáveis à Vercel
-- [x] Informar quando Supabase e Vercel estiverem configurados para o teste ponta a ponta
+- [x] Adicionar as variáveis à Vercel
+- [ ] Reaplicar `supabase/schema.sql` para ajustar o limite do bucket para 25 MB
+- [ ] Configurar as URLs permitidas e os templates de e-mail no Supabase Auth
+- [ ] Fazer o teste ponta a ponta com um áudio real em produção
 
 ## Próximo marco — MVP funcional
 
-1. Provisionar e conectar Supabase e Groq. **Concluído localmente.**
+1. Provisionar e conectar Supabase e Groq. **Concluído.**
 2. Atualizar o schema para arquivos de áudio e estados de processamento. **Concluído.**
-3. Implementar gravação e upload privado.
-4. Implementar transcrição Groq.
-5. Gerar e persistir a memória estruturada.
-6. Criar a página de revisão e edição.
-7. Publicar na Vercel e validar o fluxo de ponta a ponta.
+3. Implementar gravação e upload privado. **Concluído.**
+4. Implementar transcrição Groq. **Concluído.**
+5. Gerar e persistir a memória estruturada. **Concluído.**
+6. Reencontrar as reuniões pelo histórico. **Concluído.**
+7. Criar a página de revisão e edição. **Pendente.**
+8. Validar o fluxo de ponta a ponta em produção. **Pendente.**
 
 ## Critério de conclusão do MVP
 
@@ -213,7 +224,12 @@ O MVP estará concluído quando um usuário puder criar uma conta, gravar ou env
 | --- | --- | --- |
 | 04/09/2026 | `pnpm lint` | Aprovado |
 | 04/09/2026 | `pnpm build` | Aprovado — rotas `/` e `/login` |
-| 04/09/2026 | Supabase remoto | 4 tabelas públicas verificadas; bucket privado `meeting-audios` com 4 políticas, limite de 200 MB e 6 MIME types |
+| 04/09/2026 | Supabase remoto | 4 tabelas públicas verificadas; bucket privado `meeting-audios` com 4 políticas e 6 MIME types |
 | 04/09/2026 | Interface institucional Radix/shadcn | Lint e build aprovados; renderização local verificada sem erros no navegador |
 | 08/09/2026 | Primeiro acesso | Rota de callback e redirecionamento de confirmação implementados; pendente salvar e testar configuração no Supabase |
 | 08/09/2026 | Fluxo de áudio | Upload privado, transcrição Groq, resumo estruturado e visualização da reunião implementados; pendente teste com áudio real em produção |
+| 14/09/2026 | `pnpm lint` | Aprovado |
+| 14/09/2026 | `pnpm build` | Aprovado — 7 rotas, todas dinâmicas |
+| 14/09/2026 | Proteção de rotas | `/` e `/meetings/new` sem sessão respondem 307 para `/login` |
+| 14/09/2026 | Funções de data, status e áudio | 30 casos executados, todos aprovados, incluindo fuso de São Paulo |
+| 14/09/2026 | Fluxo autenticado ponta a ponta | **Não executado** — sem sessão nem chaves neste ambiente |
