@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { FileAudio, LoaderCircle, Mic, Upload } from "lucide-react";
+import { FileAudio, LoaderCircle, Mic, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MeetingRecorder } from "@/components/meeting-recorder";
@@ -24,12 +24,22 @@ export function MeetingUploadForm() {
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  /**
+   * O input de arquivo é não-controlado: sem zerar o valor dele, escolher o
+   * mesmo arquivo de novo não dispara `change` e a seleção não voltaria.
+   */
+  function clearFile() {
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    setFile(null);
+    setMessage(null);
+  }
 
   function chooseMode(next: Mode) {
     if (submitting || next === mode) return;
     setMode(next);
-    setFile(null);
-    setMessage(null);
+    clearFile();
   }
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -113,16 +123,30 @@ export function MeetingUploadForm() {
       ) : (
         <label className="grid gap-2 text-sm font-medium">
           Arquivo de áudio
-          <Input type="file" accept={`${ACCEPTED_MIME_TYPES.join(",")},.mp3,.m4a,.wav,.webm,.ogg`} onChange={(event) => setFile(event.target.files?.[0] ?? null)} disabled={submitting} />
+          <Input ref={fileInputRef} type="file" accept={`${ACCEPTED_MIME_TYPES.join(",")},.mp3,.m4a,.wav,.webm,.ogg`} onChange={(event) => setFile(event.target.files?.[0] ?? null)} disabled={submitting} />
           <span className="text-xs font-normal text-muted-foreground">MP3, M4A, WAV, WebM ou OGG · até 25 MB</span>
         </label>
       )}
 
       {file ? (
         <div className="flex items-center gap-3 rounded-lg border bg-muted/40 p-3 text-sm">
-          <FileAudio className="size-5 text-primary" />
+          <FileAudio className="size-5 shrink-0 text-primary" />
           <span className="min-w-0 flex-1 truncate">{file.name}</span>
-          <span className="text-xs text-muted-foreground">{(file.size / 1024 / 1024).toFixed(1)} MB</span>
+          <span className="shrink-0 text-xs text-muted-foreground">{(file.size / 1024 / 1024).toFixed(1)} MB</span>
+          {mode === "upload" ? (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-7 shrink-0 text-muted-foreground hover:text-red-600"
+              onClick={clearFile}
+              disabled={submitting}
+              aria-label={`Remover o arquivo ${file.name}`}
+              title="Remover arquivo"
+            >
+              <X />
+            </Button>
+          ) : null}
         </div>
       ) : null}
 

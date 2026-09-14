@@ -134,6 +134,7 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 - [x] Onda completa da gravação exibida ao encerrar
 - [x] Prévia do áudio antes do envio
 - [x] Upload de MP3, M4A, WAV, WebM e OGG
+- [x] Remover o arquivo escolhido antes de enviar
 - [x] Validação de formato e tamanho
 - [x] Upload direto para o Supabase Storage
 - [x] Extensão do arquivo derivada do tipo do áudio, não do nome enviado
