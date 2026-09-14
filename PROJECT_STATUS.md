@@ -130,6 +130,8 @@ Aplicação web que permite gravar uma reunião pelo navegador ou enviar um arqu
 
 - [x] Gravação pelo microfone com `MediaRecorder`
 - [x] Pausar, continuar, encerrar e descartar gravação
+- [x] Onda de áudio ao vivo durante a gravação, congelada ao pausar
+- [x] Onda completa da gravação exibida ao encerrar
 - [x] Prévia do áudio antes do envio
 - [x] Upload de MP3, M4A, WAV, WebM e OGG
 - [x] Validação de formato e tamanho
@@ -236,3 +238,4 @@ O MVP estará concluído quando um usuário puder criar uma conta, gravar ou env
 | 14/09/2026 | Funções de data, status e áudio | 30 casos executados, todos aprovados, incluindo fuso de São Paulo |
 | 14/09/2026 | Fluxo autenticado ponta a ponta | **Não executado** — sem sessão nem chaves neste ambiente |
 | 14/09/2026 | Camada de edição da memória | `pnpm lint` e `pnpm build` aprovados; rotas protegidas seguem respondendo 307; nenhum erro no log do servidor |
+| 14/09/2026 | Onda de áudio | 11 casos das funções de desenho aprovados; renderização conferida em Chromium headless — 142 barras, alturas de 2 a 56 px em 36 níveis distintos |
